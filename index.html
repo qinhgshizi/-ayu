@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NetWeave | SD-WAN 拓扑设计台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="extras.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-mark">N</span><span>NETWEAVE</span><i>/</i><small>TOPOLOGY STUDIO</small></a>
+    <div class="project-name"><span class="status-dot"></span><input id="projectName" value="华东区域安防组网" aria-label="项目名称" /><span>已保存</span></div>
+    <div class="top-actions"><button class="ghost" id="undoBtn" title="撤销上一步（Ctrl+Z）">↶ 撤销</button><button class="ghost" id="resetBtn">重置画布</button><button class="ghost" id="saveBtn">保存</button><button class="export" id="exportJpgBtn">导出 JPG <span>↗</span></button><button class="ghost" id="exportBtn">JSON</button></div>
+  </header>
+
+  <main class="app-shell">
+    <aside class="library">
+      <div class="panel-title"><span>设备库</span><button id="addSite" title="添加站点">＋</button></div>
+      <div class="search"><span>⌕</span><input id="deviceSearch" placeholder="搜索设备" /></div>
+      <section><p class="section-label">路由器型号（拖拽添加）</p><table class="model-table"><thead><tr><th>图标</th><th>型号</th><th>操作</th></tr></thead><tbody id="routerModelsList"></tbody></table></section>
+      <section><p class="section-label">网络与传输</p><div class="device-grid" id="networkDevices"></div></section>
+      <section><p class="section-label">安防终端</p><div class="device-grid" id="securityDevices"></div></section>
+      <section><p class="section-label">基础设备</p><div class="device-grid" id="basicDevices"></div></section>
+      <div class="tip"><b>拖拽添加</b><br>将设备拖至右侧画布，点击<br>「连线」后依次选择两个设备。</div>
+    </aside>
+
+    <section class="workspace">
+      <div class="canvas-toolbar">
+        <div class="view-tabs"><button class="active" id="topologyTab">拓扑设计</button><button id="inventoryTab">设备清单 <span id="nodeCount">0</span></button><span class="board-divider"></span><div class="board-tabs" id="boardTabs"></div><button class="add-board" id="addBoard" title="新建画布">＋</button></div>
+        <div class="canvas-actions"><select id="linkMode" aria-label="链路类型"><option value="wired">网线连接</option><option value="wifi">Wi-Fi 连接</option><option value="wan">SD-WAN 隧道</option><option value="backup">4G 备链</option></select><button id="connectBtn">⌁ 连线</button><button id="zoomOut">−</button><span id="zoomValue">100%</span><button id="zoomIn">＋</button><button id="fitBtn">适应画布</button></div>
+      </div>
+      <div class="canvas-wrap" id="canvasWrap">
+        <div class="canvas" id="canvas">
+          <svg id="wires" aria-hidden="true"></svg>
+          <div class="canvas-hint" id="canvasHint"><span>＋</span><b>开始构建网络</b><em>从左侧拖入设备，或使用示例拓扑</em><button id="loadSample">加载示例</button></div>
+          <div class="inventory-panel hidden" id="inventoryPanel"><div class="inventory-heading"><div><p>路由器型号清单</p><small>仅统计当前拓扑图中已出现的型号路由器</small></div><button id="closeInventory">返回拓扑</button></div><table><thead><tr><th>路由器型号</th><th>拓扑设备数量</th><th>设备类别</th></tr></thead><tbody id="inventoryBody"></tbody></table><div class="empty-list hidden" id="emptyList">当前拓扑中暂未添加型号路由器</div></div>
+        </div>
+        <div class="map-legend"><span><i class="legend-line wired"></i>网线</span><span><i class="legend-line wifi"></i>Wi-Fi</span><span><i class="legend-line wan"></i>SD-WAN 隧道</span><span><i class="legend-line warning"></i>4G 备链</span></div>
+      </div>
+    </section>
+
+    <aside class="inspector" id="inspector">
+      <div class="empty-inspector" id="emptyInspector"><div class="inspect-icon">◈</div><b>选择一个设备</b><p>点击画布中的设备以查看<br>配置与运行状态</p></div>
+      <div class="device-inspector hidden" id="deviceInspector">
+        <div class="inspector-head"><span>设备属性</span><button id="deleteBtn" title="删除设备">⌫</button></div>
+        <div class="selected-device"><div id="selectedIcon" class="node-icon"></div><div><b id="selectedName"></b><small id="selectedType"></small></div><span class="online-badge">在线</span></div>
+        <label>设备名称<input id="nameField" /></label>
+        <label>所属站点<select id="siteField"><option>总部 · 上海</option><option>分部 · 杭州</option><option>门店 · 南京</option></select></label>
+        <div class="form-row"><label>IP 地址<input id="ipField" /></label><label>状态<select id="statusField"><option>在线</option><option>告警</option><option>离线</option></select></label></div>
+        <hr><p class="section-label">链路信息</p><div class="metric"><span>上行带宽</span><b>100 <small>Mbps</small></b></div><div class="metric"><span>当前延迟</span><b class="green">12 <small>ms</small></b></div><div class="metric"><span>丢包率</span><b>0.02 <small>%</small></b></div>
+        <button class="apply" id="applyBtn">应用更改</button>
+      </div>
+    </aside>
+  </main>
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+  <script src="selection.js"></script>
+</body>
+</html>
+
